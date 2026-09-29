@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABHA Consent-Driven Record</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-area">
+      <span class="badge-flag">🇮🇳</span>
+      <h2>Ayushman Bharat Digital Health</h2>
+      <span class="tag">Python FastAPI Prototype</span>
+    </div>
+    <div class="header-actions">
+      <div class="view-switcher">
+        <button id="showPatientBtn" class="active">Patient View</button>
+        <button id="showDoctorBtn">Doctor View</button>
+        <button id="showSplitBtn">Side-by-Side</button>
+      </div>
+      <a id="logoutLink" class="logout-link hidden" href="/">Switch role</a>
+    </div>
+  </header>
+
+  <main class="viewport-container">
+    
+    <!-- PATIENT SMARTPHONE -->
+    <section class="device-frame" id="patientDevice">
+      <div class="device-topbar">
+        <span>09:41</span>
+        <span>ABHA Locker 🔒</span>
+        <span>100%</span>
+      </div>
+      
+      <div class="screen-content">
+        <div class="patient-id-card">
+          <h3>Rameshwar Sharma</h3>
+          <p class="abha-num">ABHA ID: <strong>91-8472-1049-3829</strong></p>
+        </div>
+
+        <section class="section-card patient-record-editor">
+          <div class="record-editor-heading">
+            <div>
+              <h4>My Health Record</h4>
+              <p class="hint">Update the information shared with your consent.</p>
+            </div>
+            <button id="savePatientRecordBtn" class="btn btn-primary record-save-btn" type="button">Save record</button>
+          </div>
+
+          <section class="record-edit-group">
+            <div class="record-section-heading">
+              <h5>Allergies</h5>
+              <button class="record-add-btn" data-add-record="allergies" type="button">+ Add</button>
+            </div>
+            <div id="allergyRows" class="record-rows"></div>
+          </section>
+
+          <section class="record-edit-group">
+            <div class="record-section-heading">
+              <h5>Medications</h5>
+              <button class="record-add-btn" data-add-record="medications" type="button">+ Add</button>
+            </div>
+            <div id="medicationRows" class="record-rows"></div>
+            <div class="prescription-import">
+              <label for="prescriptionUpload">Import prescription image or PDF</label>
+              <input id="prescriptionUpload" type="file" accept="image/*,.pdf,application/pdf">
+              <p id="prescriptionStatus" class="hint">Processed in this browser. Verify OCR suggestions before saving or sharing.</p>
+              <details class="ocr-text-details">
+                <summary>Review extracted text</summary>
+                <pre id="prescriptionTextPreview"></pre>
+              </details>
+            </div>
+          </section>
+
+          <section class="record-edit-group">
+            <div class="record-section-heading">
+              <h5>Lab results</h5>
+              <button class="record-add-btn" data-add-record="diagnostics" type="button">+ Add</button>
+            </div>
+            <div id="diagnosticRows" class="record-rows"></div>
+          </section>
+
+          <section class="record-edit-group">
+            <div class="record-section-heading">
+              <h5>Visit notes</h5>
+              <button class="record-add-btn" data-add-record="notes" type="button">+ Add</button>
+            </div>
+            <div id="noteRows" class="record-rows"></div>
+          </section>
+          <p id="recordSaveStatus" class="record-status" role="status"></p>
+        </section>
+
+        <div class="consent-config-card">
+          <h4>Configure Consent</h4>
+          <p class="subtext">Select what to share for this visit:</p>
+          
+          <div class="scope-grid">
+            <label><input type="checkbox" id="scopeAllergies" checked> ⚠️ Allergies</label>
+            <label><input type="checkbox" id="scopeMeds" checked> 💊 Active Meds</label>
+            <label><input type="checkbox" id="scopeLabs" checked> 🧪 Recent Labs</label>
+            <label><input type="checkbox" id="scopeNotes"> 📝 PHC Notes</label>
+          </div>
+
+          <div class="duration-row">
+            <label>Valid For:</label>
+            <select id="consentDuration">
+              <option value="15">15 Minutes</option>
+              <option value="60" selected>1 Hour</option>
+              <option value="120">2 Hours</option>
+            </select>
+          </div>
+
+          <button id="generateQrBtn" class="btn btn-primary">Generate Dynamic QR</button>
+        </div>
+
+        <div id="qrDisplayArea" class="qr-output-card hidden">
+          <h4>Show to Doctor to Scan</h4>
+          <div id="qrcode" class="qr-container"></div>
+          <p class="qr-scan-instructions">On the doctor's phone, open the Camera app, scan this code, then tap the link.</p>
+          <div class="qr-timer">Expires in: <strong id="timerDisplay">60:00</strong></div>
+
+          <div class="revocation-zone">
+            <button id="revokeBtn" class="btn btn-danger">REVOKE ACCESS NOW ✕</button>
+            <p class="help-text">Terminates doctor's screen view instantly</p>
+          </div>
+        </div>
+
+        <div class="audit-log-card">
+          <h4>Audit Trail</h4>
+          <ul id="auditLogList">
+            <li>[System] Profile active</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOCTOR SMARTPHONE (PWA SCANNER) -->
+    <section class="device-frame" id="doctorDevice">
+      <div class="device-topbar provider-topbar">
+        <span>PHC Point-of-Care Desk</span>
+        <span>Dr. S. K. Verma</span>
+      </div>
+
+      <div class="screen-content">
+        
+        <div id="scannerView" class="scanner-box">
+          <div class="scanner-reticle">
+            <div class="scan-line"></div>
+          </div>
+          <p id="scanStatus">Scan the patient's QR code to open their shared record.</p>
+          <div class="scanner-controls">
+            <button id="liveScanBtn" class="btn btn-primary" type="button">Start live camera scan</button>
+            <label class="btn btn-accent" for="qrImageInput">Open camera or QR photo</label>
+            <input id="qrImageInput" class="hidden" type="file" accept="image/*" capture="environment">
+          </div>
+          <div id="qrScannerReader" class="qr-scanner-reader hidden"></div>
+          <button id="simulateScanBtn" class="btn btn-accent">Test with this browser</button>
+        </div>
+
+        <div id="recordsView" class="records-container hidden">
+          <div class="access-banner">
+            <span>Patient: Rameshwar Sharma</span>
+            <span class="badge-live">LIVE ACCESS</span>
+          </div>
+
+          <div id="allergyAlertSection" class="alert-box-danger">
+            <strong>⚠️ RECORDED ALLERGIES:</strong>
+            <ul id="allergyList"></ul>
+          </div>
+
+          <div class="section-card">
+            <h4>💊 Current Active Prescriptions</h4>
+            <p class="hint">Prevents duplicate antibiotic/hypertension scripts</p>
+            <div id="medsList" class="data-list"></div>
+          </div>
+
+          <div class="section-card">
+            <h4>🧪 Prior Lab Tests</h4>
+            <p class="hint">Prevents repeating recent blood tests</p>
+            <div id="labsList" class="data-list"></div>
+          </div>
+        </div>
+
+        <!-- Lockout Overlay -->
+        <div id="lockoutOverlay" class="lockout-screen hidden">
+          <div class="lock-icon">🔒</div>
+          <h3>ACCESS REVOKED</h3>
+          <p>The patient terminated record access.</p>
+          <button id="returnToScanBtn" class="btn btn-primary" style="margin-top:20px;">Back to Scanner</button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/patient.js"></script>
+  <script src="/static/provider.js"></script>
+</body>
+</html>

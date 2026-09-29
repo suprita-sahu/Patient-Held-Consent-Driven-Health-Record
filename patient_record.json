@@ -1,0 +1,60 @@
+{
+  "allergies": [
+    {
+      "substance": "Amoxicillin / Penicillin Group",
+      "reaction": "Anaphylactic rash & Angioedema",
+      "severity": "HIGH"
+    }
+  ],
+  "medications": [
+    {
+      "drug": "Metformin 500mg",
+      "dosage": "1 tab twice daily (After food)",
+      "facility": "PHC Narsingi",
+      "date": "2026-03-24"
+    },
+    {
+      "drug": "Telmisartan 40mg",
+      "dosage": "1 tab morning",
+      "facility": "City Heart Care",
+      "date": "2026-02-15"
+    },
+    {
+      "drug": "Atorvastatin 10mg",
+      "dosage": "1 tab at bedtime",
+      "facility": "District Hospital",
+      "date": "2026-01-10"
+    }
+  ],
+  "diagnostics": [
+    {
+      "test": "HbA1c (Glycated Hemoglobin)",
+      "value": "7.4 %",
+      "normal_range": "< 5.7 %",
+      "date": "2026-03-12",
+      "facility": "Dr. PathLabs PHC"
+    },
+    {
+      "test": "Serum Creatinine",
+      "value": "1.05 mg/dL",
+      "normal_range": "0.7 - 1.3 mg/dL",
+      "date": "2026-03-12",
+      "facility": "Dr. PathLabs PHC"
+    },
+    {
+      "test": "Total Cholesterol",
+      "value": "198 mg/dL",
+      "normal_range": "< 200 mg/dL",
+      "date": "2026-01-09",
+      "facility": "District Hospital Lab"
+    }
+  ],
+  "notes": [
+    {
+      "date": "2026-03-24",
+      "doctor": "Dr. S. K. Verma",
+      "clinic": "Primary Health Centre (PHC)",
+      "note": "Type-2 DM routine followup. Advised dietary control."
+    }
+  ]
+}

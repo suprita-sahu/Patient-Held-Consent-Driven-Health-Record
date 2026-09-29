@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABHA Health Records | Sign In</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-page">
+  <header class="login-header">
+    <a class="login-brand" href="/">
+      <span class="login-brand-mark">ABHA</span>
+      <span class="login-brand-name">Ayushman Bharat Digital Health</span>
+    </a>
+    <span class="login-environment">DEMO PORTAL</span>
+  </header>
+
+  <main class="login-content">
+    <p class="login-kicker">HEALTH RECORD ACCESS</p>
+    <h1>Sign in to your workspace</h1>
+    <p class="login-subtitle">Choose a role to continue to the matching portal.</p>
+
+    <div class="login-roles">
+      <a class="role-choice patient-role" href="/patient">
+        <span class="role-icon" aria-hidden="true">P</span>
+        <span class="role-copy">Patient<small>Manage consent and record sharing</small></span>
+        <span class="role-arrow" aria-hidden="true">&#8594;</span>
+      </a>
+      <a class="role-choice doctor-role" href="/doctor">
+        <span class="role-icon" aria-hidden="true">D</span>
+        <span class="role-copy">Doctor<small>Scan consent and review shared records</small></span>
+        <span class="role-arrow" aria-hidden="true">&#8594;</span>
+      </a>
+    </div>
+
+    <p class="demo-notice">Demo access only. Choosing a role does not authenticate an account.</p>
+  </main>
+</body>
+</html>
